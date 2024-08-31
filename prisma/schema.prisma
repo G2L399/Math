@@ -1,0 +1,75 @@
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "mysql"
+  url      = env("DATABASE_URL")
+}
+
+model user {
+  id                String   @id @default(uuid())
+  username          String    @unique
+  age               Int     
+  email             String   @unique
+  password          String?
+  role              Role     @default(USER)
+  createdAt         DateTime @default(now())
+  updatedAt         DateTime @updatedAt
+
+  userProgress user_progress[]
+
+  @@map("User")
+}
+
+model user_progress {
+  id                String   @id @default(uuid())
+  course_id         String
+  lesson_id         String
+  last_accessed     DateTime
+  createdAt         DateTime @default(now())
+  updatedAt         DateTime @updatedAt
+  user user[]
+  lesson lessons[]
+  course course[]
+
+  @@map("UserProgress")
+}
+
+model course {
+  id                String    @id @default(uuid())
+  course_name       String
+  category          String
+  description       String
+  level             String
+  thumbnail         String
+  is_available      Availability @default(YES)
+
+  lessons lessons[]
+  user_progress user_progress[]
+  @@map("Course")
+}
+
+model lessons {
+  id                String   @id @default(uuid())
+   course_id        String
+   question_image   String
+   question_name    String
+   question_detail  String 
+   answer           String
+
+   course course[]
+   user_progress user_progress[]
+  @@map("Lessons")
+}
+
+enum Availability {
+  YES
+  NO
+}
+enum Role {
+  USER
+  ADMIN
+  SUPERADMIN
+}
